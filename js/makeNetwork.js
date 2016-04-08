@@ -36,12 +36,6 @@ function construct() {
     .style("z-index", "10")
     .style("opacity", 0);
 
-  // for (i = 0; i < nodeData.length; i++) {
-  //   console.log(i, nodeData[i])
-  //   nodeData[i].x = 500;
-  //   nodeData[i].y = 500;
-  // }
-
   force = d3.layout.force()
     .gravity(0.05)
     .charge(-30)
@@ -81,18 +75,6 @@ function construct() {
     })
     .style("opacity", 1);
 
-  // node.append("text")
-  //   .attr("dx", 12)
-  //   .attr("dy", ".35em")
-  //   .text(function(d) { return d.name; });
-
-  // var text = svg.selectAll(".text")
-  //   .data(nodeData)
-  //   .enter().append("text")
-  //   .attr("dx", 8)
-  //   .attr("dy", ".31em")
-  //   .text(function(d) { return d.name; });
-
   var labels = node.append("text")
     .text(function(d) { return d.name; });
 
@@ -111,10 +93,6 @@ function construct() {
     node.attr("cx", function (d) { return d.x; })
         .attr("cy", function (d) { return d.y; });
 
-    // node.attr("transform", function(d) { 
-    //   return 'translate(' + [d.x, d.y] + ')'; 
-    // });  
-
     node.each(collide(0.7)); //Added 
   });
 
@@ -126,23 +104,7 @@ function construct() {
   force.stop();
   
   function linkMouseover(d) {
-    // svg.selectAll(".link").classed("active", function(p) { return p === d});
-    // svg.selectAll(".node circle").classed("active", function(p) { return p === d});
-    // var info = [d.source, d.target],
-    //     source = d.source.node,
-    //     target = d.target.node;
-
-    // _.forEach(links, function(val) {
-    //   if(source === val.source && target === val.target) {
-    //     info.push(val);
-    //   } else if(target === val.source && source === val.target) {
-    //     info.push(val);
-    //   }
-    // })
-    
-    // setTimeout(function() { console.log(info) }, 2000)
   }
-
 
   function nodeMouseover(d) {
     var pos = d3.mouse(this);
