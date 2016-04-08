@@ -22,7 +22,7 @@
     <input id="quarter" data-slider-id='ex1Slider' type="text" data-slider-min="1" data-slider-max="4" data-slider-step="1" data-slider-value="2"/>
     <div id="timePeriod"></div>
   </div>
-  <div class="col-md-4" id="time"><h2> Showing Q<span id="displayQuarter">2</span> of <span id="displayYear">2015</span>. </h2></div>
+  <div class="col-md-4" id="time">Showing Q<span id="displayQuarter">2</span> of <span id="displayYear">2015</span>. </div>
   <div class="col-md-4">   
     <div id="infoBox">
     <h3>Debt between <span class="node1"></span> and <span class="node2"></span></h3>
@@ -53,7 +53,8 @@
 
     quarterSlider.on('slideStop', function() {
       initNetwork(yearSlider.slider('getValue'), quarterSlider.slider('getValue'))
-      hideLinkInfo();  
+      $('#infoBox').hide();
+      
       $('#displayQuarter').text(quarterSlider.slider('getValue'))
     })
 

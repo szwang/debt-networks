@@ -50,8 +50,7 @@ function construct() {
   svg = d3.select("#container").append("svg")
     .attr("width", width)
     .attr("height", height)
-    .attr("id", "network")
-    .style("background-color", "#99ffd6");
+    .attr("id", "network");
 
 
   force.nodes(nodeData)
@@ -161,14 +160,15 @@ function construct() {
   function click(d) {
     if(clicked.length === 0) {
       clicked.push(d);
-      d3.select(this).select("circle").transition()
-        .duration(750)
-        .attr("class", "selected");
+      d3.select(this).select("circle")
+        .style("border", "1px solid black")
+
     } else if(clicked.length === 1) {
       clicked.push(d);
       d3.select(this).select("circle").transition()
         .duration(750)
-        .attr("class", "selected");
+        .style("border", "1px solid black")
+        // .attr("class", "selected");
       showLinkInfo();
     } else if(clicked.length === 2) {
       hideLinkInfo();
@@ -176,10 +176,13 @@ function construct() {
       hideLinkInfo();
     }
   } 
+
 }
 
 function showLinkInfo() {
 // take clicked[0].node (country code) and clicked[1].node
+  if(clicked.length === 0) return;
+
   var node1 = clicked[0].node,
       node1Name = clicked[0].name,
       node2 = clicked[1].node,
