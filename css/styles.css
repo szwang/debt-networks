@@ -7,6 +7,13 @@ text {
   font: 10px sans-serif;
   pointer-events: none;
 }
+
+#loadingGif {
+  height: 180px;
+  width: 200px;
+  margin: 0 auto;
+  display: block;
+}
 /*#infoBox {
   height: 100px;
   width: 100px;

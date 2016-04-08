@@ -16,15 +16,16 @@ $(document).ready(function() {
 })
 
 function initNetwork(year, quarter) {
+  $("#network").remove();
+  // $("#container").append("<img id='loadingGif' src='../data/loading.gif' />")
   getNodes(year, quarter, function() {
     getLinks(year, quarter, function() {
-      construct();  
+      construct();
     })
   })
 }
 
 function construct() {
-  $("#network").remove();
 
   var color = d3.scale.category10();
 
@@ -100,14 +101,16 @@ function construct() {
   force.start();
 
   //comment this out for force directed graph
-  for (var i = 1000; i > 0; --i) force.tick();
-  force.stop();
+  // for (var i = 1000; i > 0; --i) force.tick();
+  // $("#loadingGif").remove();  
+  // force.stop();
   
   function linkMouseover(d) {
   }
 
   function nodeMouseover(d) {
     var pos = d3.mouse(this);
+    var linkNum;
 
     tooltip.html(
       "<span id='name'>" + d.name + "</span> : $" + convertToDollar(d.debt)
@@ -120,6 +123,11 @@ function construct() {
     .style("background-color", "white")
     .style("border-color", "black")
 
+    svg.selectAll(".link").classed("active", function(p) { 
+      console.log(p, d)
+      return p === d; }
+      );
+    svg.selectAll(".node circle").classed("active", function(p) { return p === d.source || p === d.target; });
   }
 
   function moveTooltip(node){
@@ -198,6 +206,8 @@ function getNodes(year, quarter, callback) {
 function getLinks(year, quarter, callback) {
   linkData = [];
 
+  console.log(nodeOrder)
+
   $.getJSON('../data/links.json', function(allLinks) {
     _.forEach(allLinks, (val) => {
       var timeKey = constructTimeKey(year, quarter, "link");
@@ -209,7 +219,9 @@ function getLinks(year, quarter, callback) {
         var data = {
           source: sourceOrder,
           target: targetOrder,
-          owed: debt
+          owed: debt,
+          sourceC: val.source,
+          sourceT: val.target
         }
         linkData.push(data);
       }
