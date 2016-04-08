@@ -40,9 +40,15 @@ function construct() {
     .style("z-index", "10")
     .style("opacity", 0);
 
+  // for (i = 0; i < nodeData.length; i++) {
+  //   console.log(i, nodeData[i])
+  //   nodeData[i].x = 500;
+  //   nodeData[i].y = 500;
+  // }
+
   force = d3.layout.force()
     .gravity(0.05)
-    .charge(-100)
+    .charge(-30)
     .distance(300)
     .size([width, height]);
 
@@ -84,7 +90,7 @@ function construct() {
     .enter().append("circle")
     .attr("class", "node")
     .attr("r", function(d) {
-      return Math.sqrt(Math.sqrt(d.debt));
+      return Math.sqrt(d.debt) / 25;
     })
     .style("fill", function (d) {
       return color(d.continent);
