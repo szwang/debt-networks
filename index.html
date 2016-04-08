@@ -16,30 +16,44 @@
 
 <body>
   <h1>International Debt Networks</h1>
-  <div id="sliderContainer">
-    <input id="year" data-slider-id='ex1Slider' type="text" data-slider-min="2000" data-slider-max="2015" data-slider-step="1" data-slider-value="2015"/>
+  <div id="sliderContainer" class="col-md-8">
+    <div>Year</div><input id="year" data-slider-id='ex1Slider' type="text" data-slider-min="2000" data-slider-max="2016" data-slider-step="1" data-slider-value="2015"/>
+    <div>Quarter</div>
     <input id="quarter" data-slider-id='ex1Slider' type="text" data-slider-min="1" data-slider-max="4" data-slider-step="1" data-slider-value="2"/>
     <div id="timePeriod"></div>
   </div>
+  <div class="col-md-4"> Showing quarter <span id="displayQuarter">2</span> of <span id="displayYear">2015</span>. </div>
   <div id="container"></div>
   <div id="chart"></div>
 
   <script type="text/javascript">
     
-    var yearSlider = $("#year").slider({
-      tooltip: 'always'
-    });
+    var yearSlider = $("#year").slider();
+    var quarterSlider = $("#quarter").slider();
 
-    var quarterSlider = $("#quarter").slider({
-      tooltip: 'always'
-    });
+    function changeYear() {
+      initNetwork(yearSlider.slider('getValue'), quarterSlider.slider('getValue'));
+      $('#displayYear').text(yearSlider.slider('getValue'))
+    }
 
     yearSlider.on('slideStop', function() {
-      initNetwork(yearSlider.slider('getValue'), quarterSlider.slider('getValue'));
+      changeYear();
     })
 
     quarterSlider.on('slideStop', function() {
       initNetwork(yearSlider.slider('getValue'), quarterSlider.slider('getValue'))
+      $('#displayQuarter').text(quarterSlider.slider('getValue'))
+    })
+
+    $(document).keypress(function(e) {
+      var curr = yearSlider.slider('getValue');
+      if(e.which === 44) {
+        curr--;
+      } else if(e.which === 46) {
+        curr++;
+      }
+      yearSlider.slider('setValue', curr, true);
+      changeYear();
     })
 
   </script>

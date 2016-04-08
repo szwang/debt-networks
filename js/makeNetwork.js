@@ -3,15 +3,11 @@ var linkData,
     nodeData,
     nodeOrder;
 
-//defaults
-// var year = 2015,
-//     quarter = 2;
-
 var width = 1000,
-    height = 1000,
+    height = 900,
     nodeMin = 3;
 
-var force, svg, OP;
+var force, svg;
 // var loading_gif = new Image();
 // loading_gif.src = './assets/loading.gif'
 
@@ -49,7 +45,7 @@ function construct() {
   force = d3.layout.force()
     .gravity(0.05)
     .charge(-30)
-    .distance(300)
+    .distance(340)
     .size([width, height]);
 
   d3.select("svg").remove();
@@ -59,22 +55,10 @@ function construct() {
     .attr("height", height)
     .attr("id", "network");
 
-  console.log(nodeData, linkData)
 
   force.nodes(nodeData)
        .links(linkData);
 
-  force.on("tick", function () {
-    link.attr("x1", function (d) { return d.source.x; })
-        .attr("y1", function (d) { return d.source.y; })
-        .attr("x2", function (d) { return d.target.x; })
-        .attr("y2", function (d) { return d.target.y; });
-
-    node.attr("cx", function (d) { return d.x; })
-        .attr("cy", function (d) { return d.y; });
-
-    node.each(collide(0.5)); //Added 
-  });
 
   var link = svg.selectAll(".link")
     .data(linkData)
@@ -95,19 +79,51 @@ function construct() {
     .style("fill", function (d) {
       return color(d.continent);
     })
-    .style("opacity", 1)
-    .call(force.drag)
+    .style("opacity", 1);
 
-  node.append("text")
-    .attr("dx", 12)
-    .attr("dy", ".35em")
-    .text(function(d) { return d.name });
+  // node.append("text")
+  //   .attr("dx", 12)
+  //   .attr("dy", ".35em")
+  //   .text(function(d) { return d.name; });
+
+  // var text = svg.selectAll(".text")
+  //   .data(nodeData)
+  //   .enter().append("text")
+  //   .attr("dx", 8)
+  //   .attr("dy", ".31em")
+  //   .text(function(d) { return d.name; });
+
+  var labels = node.append("text")
+    .text(function(d) { return d.name; });
+
 
   node.on("mouseover", nodeMouseover)
       .on("mousemove", moveTooltip)
-      .on("mouseleave", removeTooltip);
+      .on("mouseleave", removeTooltip)
+      .call(force.drag)
+
+  force.on("tick", function () {
+    link.attr("x1", function (d) { return d.source.x; })
+        .attr("y1", function (d) { return d.source.y; })
+        .attr("x2", function (d) { return d.target.x; })
+        .attr("y2", function (d) { return d.target.y; });
+
+    node.attr("cx", function (d) { return d.x; })
+        .attr("cy", function (d) { return d.y; });
+
+    // node.attr("transform", function(d) { 
+    //   return 'translate(' + [d.x, d.y] + ')'; 
+    // });  
+
+    node.each(collide(0.7)); //Added 
+  });
+
 
   force.start();
+
+  //comment this out for force directed graph
+  for (var i = 1000; i > 0; --i) force.tick();
+  force.stop();
   
   function linkMouseover(d) {
     // svg.selectAll(".link").classed("active", function(p) { return p === d});
@@ -142,7 +158,6 @@ function construct() {
     .style("background-color", "white")
     .style("border-color", "black")
 
-    console.log(d.name, d.debt);
   }
 
   function moveTooltip(node){
