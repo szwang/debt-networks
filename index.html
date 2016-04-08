@@ -5,17 +5,44 @@
   <title>Debt Networks</title>
   <link rel="stylesheet" href="./libs/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./libs/bootstrap-slider/dist/css/bootstrap-slider.min.css" />
   <script src="./libs/d3.min.js"></script>
   <script type="text/javascript" src="./libs/jquery-1.10.1.min.js"></script>
   <script type="text/javascript" src="./libs/lodash.min.js"></script>
   <script type="text/javascript" src="./libs/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="./libs/bootstrap-slider/dist/bootstrap-slider.min.js"></script>
 
 </head>
 
 <body>
   <h1>International Debt Networks</h1>
+  <div id="sliderContainer">
+    <input id="year" data-slider-id='ex1Slider' type="text" data-slider-min="2000" data-slider-max="2015" data-slider-step="1" data-slider-value="2015"/>
+    <input id="quarter" data-slider-id='ex1Slider' type="text" data-slider-min="1" data-slider-max="4" data-slider-step="1" data-slider-value="2"/>
+    <div id="timePeriod"></div>
+  </div>
   <div id="container"></div>
   <div id="chart"></div>
+
+  <script type="text/javascript">
+    
+    var yearSlider = $("#year").slider({
+      tooltip: 'always'
+    });
+
+    var quarterSlider = $("#quarter").slider({
+      tooltip: 'always'
+    });
+
+    yearSlider.on('slideStop', function() {
+      initNetwork(yearSlider.slider('getValue'), quarterSlider.slider('getValue'));
+    })
+
+    quarterSlider.on('slideStop', function() {
+      initNetwork(yearSlider.slider('getValue'), quarterSlider.slider('getValue'))
+    })
+
+  </script>
 
   <script type="text/javascript" src="./libs/foundation.min.js"></script>
   <script type="text/javascript" src="./libs/jquery.embedly-3.1.1.min.js"></script>

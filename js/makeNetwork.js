@@ -1,11 +1,11 @@
 
-var links = [],
-    nodes = [],
-    nodeOrder = {};
+var linkData,
+    nodeData,
+    nodeOrder;
 
 //defaults
-var year = 2015,
-    quarter = 2;
+// var year = 2015,
+//     quarter = 2;
 
 var width = 1000,
     height = 1000,
@@ -16,15 +16,20 @@ var force, svg, OP;
 // loading_gif.src = './assets/loading.gif'
 
 $(document).ready(function() {
-  getNodes(year, quarter, function() {
-    getLinks(year, quarter, function() {
-      construct();
-    })
-  })
+  initNetwork(yearSlider.slider('getValue'), quarterSlider.slider('getValue'));
 })
 
+function initNetwork(year, quarter) {
+  getNodes(year, quarter, function() {
+    getLinks(year, quarter, function() {
+      construct();  
+    })
+  })
+}
 
 function construct() {
+  $("#network").remove();
+
   var color = d3.scale.category10();
 
   var tooltip = d3.select("#chart")
@@ -35,50 +40,23 @@ function construct() {
     .style("z-index", "10")
     .style("opacity", 0);
 
-  var force = d3.layout.force()
-      .gravity(0.05)
-      .charge(-100)
-      .distance(300)
-      .size([width, height]);
+  force = d3.layout.force()
+    .gravity(0.05)
+    .charge(-100)
+    .distance(300)
+    .size([width, height]);
 
-  var svg = d3.select("body").append("svg")
-      .attr("width", width)
-      .attr("height", height);
+  d3.select("svg").remove();
 
-  console.log(nodes, links)
+  svg = d3.select("#container").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("id", "network");
 
-  force.nodes(nodes)
-       .links(links)
-       .start();
+  console.log(nodeData, linkData)
 
-  var link = svg.selectAll(".link")
-    .data(links)
-    .enter().append("line")
-    .attr("class", "link")
-    .style("stroke-width", function(d) { return Math.sqrt(Math.log(d.owed)) / 4 })
-    .style("stroke", "gray")
-    .style("opacity", 0.8)
-    .on("mouseover", linkMouseover)
-
-  var node = svg.selectAll(".node")
-    .data(nodes)
-    .enter().append("circle")
-    .attr("class", "node")
-    .attr("r", function(d) {
-      return Math.sqrt(Math.sqrt(d.debt));
-    })
-    .style("fill", function (d) {
-      return color(d.continent);
-    })
-    .call(force.drag)
-
-  node.append("text")
-    .attr("dx", 12)
-    .attr("dy", ".35em")
-    .text(function(d) { return d.name });
-
-  node.on("mouseover", nodeMouseover)
-      .on("mousemove", moveTooltip);
+  force.nodes(nodeData)
+       .links(linkData);
 
   force.on("tick", function () {
     link.attr("x1", function (d) { return d.source.x; })
@@ -91,23 +69,56 @@ function construct() {
 
     node.each(collide(0.5)); //Added 
   });
+
+  var link = svg.selectAll(".link")
+    .data(linkData)
+    .enter().append("line")
+    .attr("class", "link")
+    .style("stroke-width", function(d) { return Math.sqrt(Math.log(d.owed)) / 4 })
+    .style("stroke", "gray")
+    .style("opacity", 0.8)
+    .on("mouseover", linkMouseover)
+
+  var node = svg.selectAll(".node")
+    .data(nodeData)
+    .enter().append("circle")
+    .attr("class", "node")
+    .attr("r", function(d) {
+      return Math.sqrt(Math.sqrt(d.debt));
+    })
+    .style("fill", function (d) {
+      return color(d.continent);
+    })
+    .style("opacity", 1)
+    .call(force.drag)
+
+  node.append("text")
+    .attr("dx", 12)
+    .attr("dy", ".35em")
+    .text(function(d) { return d.name });
+
+  node.on("mouseover", nodeMouseover)
+      .on("mousemove", moveTooltip)
+      .on("mouseleave", removeTooltip);
+
+  force.start();
   
   function linkMouseover(d) {
     // svg.selectAll(".link").classed("active", function(p) { return p === d});
     // svg.selectAll(".node circle").classed("active", function(p) { return p === d});
-    var info = [d.source, d.target],
-        source = d.source.node,
-        target = d.target.node;
+    // var info = [d.source, d.target],
+    //     source = d.source.node,
+    //     target = d.target.node;
 
-    _.forEach(links, function(val) {
-      if(source === val.source && target === val.target) {
-        info.push(val);
-      } else if(target === val.source && source === val.target) {
-        info.push(val);
-      }
-    })
+    // _.forEach(links, function(val) {
+    //   if(source === val.source && target === val.target) {
+    //     info.push(val);
+    //   } else if(target === val.source && source === val.target) {
+    //     info.push(val);
+    //   }
+    // })
     
-    setTimeout(function() { console.log(info) }, 2000)
+    // setTimeout(function() { console.log(info) }, 2000)
   }
 
 
@@ -121,6 +132,9 @@ function construct() {
     .style("left",(pos[0])+"px")
     .style("z-index", 10)
     .style("opacity", .9)
+    .style("font-weight", "bold")
+    .style("background-color", "white")
+    .style("border-color", "black")
 
     console.log(d.name, d.debt);
   }
@@ -132,16 +146,25 @@ function construct() {
       .style("left",(d3.event.pageX+10)+"px");
   }
 
-  function mouseout() {
-    svg.selectAll(".active").classed("active", false);
+  function removeTooltip(node){
+    tooltip
+      .style("z-index",  -1)
+      .style("opacity", 0)    //Make tooltip invisible
+      svg.selectAll("circle")
+      .transition()
+      .style("opacity", 0.8);
   }
+
+  // function mouseout() {
+  //   svg.selectAll(".active").classed("active", false);
+  // }
 }
 
 var padding = 1, // separation between circles
     radius = 8;
 
 function collide(alpha) {
-  var quadtree = d3.geom.quadtree(nodes);
+  var quadtree = d3.geom.quadtree(nodeData);
   return function(d) {
     var rb = 2*radius + padding,
         nx1 = d.x - rb,
@@ -167,6 +190,9 @@ function collide(alpha) {
 }
 
 function getNodes(year, quarter, callback) {
+  nodeData = [];
+  nodeOrder = {};
+
   $.getJSON('../data/nodes.json', function(allNodes) {
     _.forEach(allNodes, (val) => {
       var timeKey = constructTimeKey(year, quarter, "node");
@@ -178,8 +204,8 @@ function getNodes(year, quarter, callback) {
           name: val["Country Name"],
           debt: debt / 1000000
         }
-        nodes.push(data);
-        nodeOrder[data.node] = nodes.length - 1;
+        nodeData.push(data);
+        nodeOrder[data.node] = nodeData.length - 1;
       }
     })
     callback();
@@ -187,6 +213,8 @@ function getNodes(year, quarter, callback) {
 }
 
 function getLinks(year, quarter, callback) {
+  linkData = [];
+
   $.getJSON('../data/links.json', function(allLinks) {
     _.forEach(allLinks, (val) => {
       var timeKey = constructTimeKey(year, quarter, "link");
@@ -200,7 +228,7 @@ function getLinks(year, quarter, callback) {
           target: targetOrder,
           owed: debt
         }
-        links.push(data);
+        linkData.push(data);
       }
     })
     callback();
