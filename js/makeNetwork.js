@@ -27,6 +27,14 @@ $(document).ready(function() {
 function construct() {
   var color = d3.scale.category10();
 
+  var tooltip = d3.select("#chart")
+    .append("div")
+    .attr("class", "large-3 columns")
+    .attr("id", "tooltip")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("opacity", 0);
+
   var force = d3.layout.force()
       .gravity(0.05)
       .charge(-100)
@@ -47,7 +55,7 @@ function construct() {
     .data(links)
     .enter().append("line")
     .attr("class", "link")
-    .style("stroke-width", .6)
+    .style("stroke-width", function(d) { return Math.sqrt(Math.log(d.owed)) / 4 })
     .style("stroke", "gray")
     .style("opacity", 0.8)
     .on("mouseover", linkMouseover)
@@ -69,7 +77,8 @@ function construct() {
     .attr("dy", ".35em")
     .text(function(d) { return d.name });
 
-  node.on("mouseover", nodeMouseover);
+  node.on("mouseover", nodeMouseover)
+      .on("mousemove", moveTooltip);
 
   force.on("tick", function () {
     link.attr("x1", function (d) { return d.source.x; })
@@ -103,7 +112,24 @@ function construct() {
 
 
   function nodeMouseover(d) {
+    var pos = d3.mouse(this);
+
+    tooltip.html(
+      "<span id='name'>" + d.name + "</span> : $" + convertToDollar(d.debt)
+    )
+    .style("top", (pos[1])+"px")
+    .style("left",(pos[0])+"px")
+    .style("z-index", 10)
+    .style("opacity", .9)
+
     console.log(d.name, d.debt);
+  }
+
+  function moveTooltip(node){
+    var pos = d3.mouse(this);
+    tooltip
+      .style("top", (d3.event.pageY+10)+"px")
+      .style("left",(d3.event.pageX+10)+"px");
   }
 
   function mouseout() {
@@ -191,4 +217,10 @@ function constructTimeKey(year, quarter, type) {
     return key;
   }
 }
+
+function convertToDollar(num) {
+  var total = num * 1000000;
+  return total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 
