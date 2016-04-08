@@ -3,11 +3,13 @@ var linkData,
     nodeData,
     nodeOrder;
 
-var width = 1000,
+var width = 1200,
     height = 900,
     nodeMin = 3;
 
 var force, svg;
+
+var clicked = [];
 // var loading_gif = new Image();
 // loading_gif.src = './assets/loading.gif'
 
@@ -48,12 +50,12 @@ function construct() {
   svg = d3.select("#container").append("svg")
     .attr("width", width)
     .attr("height", height)
-    .attr("id", "network");
+    .attr("id", "network")
+    .style("background-color", "#99ffd6");
 
 
   force.nodes(nodeData)
        .links(linkData);
-
 
   var link = svg.selectAll(".link")
     .data(linkData)
@@ -76,13 +78,20 @@ function construct() {
     })
     .style("opacity", 1);
 
-  var labels = node.append("text")
+  node.append("text")
+    .attr("x", 12)
+    .attr("dy", ".35em")
     .text(function(d) { return d.name; });
+
+
+  // var labels = node.append("text")
+  //   .text(function(d) { return d.name; });
 
 
   node.on("mouseover", nodeMouseover)
       .on("mousemove", moveTooltip)
       .on("mouseleave", removeTooltip)
+      .on("click", click)
       .call(force.drag)
 
   force.on("tick", function () {
@@ -123,11 +132,10 @@ function construct() {
     .style("background-color", "white")
     .style("border-color", "black")
 
-    svg.selectAll(".link").classed("active", function(p) { 
-      console.log(p, d)
-      return p === d; }
-      );
-    svg.selectAll(".node circle").classed("active", function(p) { return p === d.source || p === d.target; });
+    // svg.selectAll(".link").classed("active", function(p) { 
+    //   return p === d; }
+    //   );
+    // svg.selectAll(".node circle").classed("active", function(p) { return p === d.source || p === d.target; });
   }
 
   function moveTooltip(node){
@@ -149,6 +157,67 @@ function construct() {
   // function mouseout() {
   //   svg.selectAll(".active").classed("active", false);
   // }
+
+  function click(d) {
+    if(clicked.length === 0) {
+      clicked.push(d);
+      d3.select(this).select("circle").transition()
+        .duration(750)
+        .attr("class", "selected");
+    } else if(clicked.length === 1) {
+      clicked.push(d);
+      d3.select(this).select("circle").transition()
+        .duration(750)
+        .attr("class", "selected");
+      showLinkInfo();
+    } else if(clicked.length === 2) {
+      hideLinkInfo();
+    } else {
+      hideLinkInfo();
+    }
+  } 
+}
+
+function showLinkInfo() {
+// take clicked[0].node (country code) and clicked[1].node
+  var node1 = clicked[0].node,
+      node1Name = clicked[0].name,
+      node2 = clicked[1].node,
+      node2Name = clicked[1].name,
+      data = [null, null],//node1 as source, node2 as source info
+      counter = 0; 
+
+  console.log(node1, node1Name, node2, node2Name)
+// run them through link data to find the links
+  _.forEach(linkData, function(val) {
+    console.log(val)
+    if(val.sourceC == node1 && val.targetC == node2) {
+      console.log('found match')
+      data[0] = val;
+      counter ++;
+    } 
+    if(val.sourceC == node2 && val.targetC == node1) {
+      data[1] = val;
+      console.log('found match')
+      counter++;
+    }
+    //exit from loop when matches are found
+    if(counter === 2) return false;
+  })
+
+  // console.log(data)
+
+// render them on the page
+  $(".node1").text(node1Name);
+  $(".node2").text(node2Name);
+  $("#1owes2").text(convertToDollar(data[1].owed).toString());
+  $("#2owes1").text(convertToDollar(data[0].owed).toString());
+  $("#infoBox").show();
+}
+
+function hideLinkInfo() {
+  $("#infoBox").hide();
+  clicked = [];
 }
 
 var padding = 1, // separation between circles
@@ -206,8 +275,6 @@ function getNodes(year, quarter, callback) {
 function getLinks(year, quarter, callback) {
   linkData = [];
 
-  console.log(nodeOrder)
-
   $.getJSON('../data/links.json', function(allLinks) {
     _.forEach(allLinks, (val) => {
       var timeKey = constructTimeKey(year, quarter, "link");
@@ -221,7 +288,7 @@ function getLinks(year, quarter, callback) {
           target: targetOrder,
           owed: debt,
           sourceC: val.source,
-          sourceT: val.target
+          targetC: val.target
         }
         linkData.push(data);
       }

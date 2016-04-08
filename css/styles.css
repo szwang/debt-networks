@@ -8,15 +8,31 @@ text {
   pointer-events: none;
 }
 
+#container {
+  margin-top: 20px;
+}
+
+#sliderContainer {
+  margin-bottom: 20px;
+}
+
+#time {
+  vertical-align: middle;
+}
+
 #loadingGif {
   height: 180px;
   width: 200px;
   margin: 0 auto;
   display: block;
 }
-/*#infoBox {
-  height: 100px;
-  width: 100px;
+
+.selected {
+  border-color: blue;
+  border-width: 10px;
+}
+
+#infoBox {
   border-width: 2px;
   border-color: black;
-}*/
+}
