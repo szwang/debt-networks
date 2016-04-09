@@ -7,9 +7,34 @@ text {
   font: 10px sans-serif;
   pointer-events: none;
 }
-/*#infoBox {
-  height: 100px;
-  width: 100px;
+
+#container {
+  margin-top: 20px;
+      
+}
+
+#sliderContainer {
+  margin-bottom: 20px;
+}
+
+#time {
+  vertical-align: middle;
+  font-size: 15px;
+}
+
+#loadingGif {
+  height: 180px;
+  width: 200px;
+  margin: 0 auto;
+  display: block;
+}
+
+/*.selected {
+  stroke-width: 3;
+  stroke: rgb(0, 0, .90);
+}*/
+
+#infoBox {
   border-width: 2px;
   border-color: black;
-}*/
+}
