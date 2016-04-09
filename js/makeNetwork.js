@@ -60,9 +60,9 @@ function construct() {
     .data(linkData)
     .enter().append("line")
     .attr("class", "link")
-    .style("stroke-width", function(d) { return Math.sqrt(Math.log(d.owed)) / 4 })
+    .style("stroke-width", function(d) { return Math.sqrt(d.owed) / 200 })
     .style("stroke", "gray")
-    .style("opacity", 0.8)
+    .style("opacity", function(d) { return Math.sqrt(d.owed) / 200})
     .on("mouseover", linkMouseover)
 
   var node = svg.selectAll(".node")
@@ -75,7 +75,7 @@ function construct() {
     .style("fill", function (d) {
       return color(d.continent);
     })
-    .style("opacity", 1);
+    .style("opacity", 2);
 
   node.append("text")
     .attr("x", 12)
@@ -190,18 +190,14 @@ function showLinkInfo() {
       data = [null, null],//node1 as source, node2 as source info
       counter = 0; 
 
-  console.log(node1, node1Name, node2, node2Name)
 // run them through link data to find the links
   _.forEach(linkData, function(val) {
-    console.log(val)
     if(val.sourceC == node1 && val.targetC == node2) {
-      console.log('found match')
       data[0] = val;
       counter ++;
     } 
     if(val.sourceC == node2 && val.targetC == node1) {
       data[1] = val;
-      console.log('found match')
       counter++;
     }
     //exit from loop when matches are found
