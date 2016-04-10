@@ -252,7 +252,7 @@ function getNodes(year, quarter, callback) {
   nodeData = [];
   nodeOrder = {};
 
-  $.getJSON('../data/nodes.json', function(allNodes) {
+  $.getJSON('https://s3.amazonaws.com/szwang/nodes.json', function(allNodes) {
     _.forEach(allNodes, (val) => {
       var timeKey = constructTimeKey(year, quarter, "node");
       var debt = val[timeKey.toString()];
@@ -274,7 +274,7 @@ function getNodes(year, quarter, callback) {
 function getLinks(year, quarter, callback) {
   linkData = [];
 
-  $.getJSON('../data/links.json', function(allLinks) {
+  $.getJSON('https://s3.amazonaws.com/szwang/links.json', function(allLinks) {
     _.forEach(allLinks, (val) => {
       var timeKey = constructTimeKey(year, quarter, "link");
       var debt = val[timeKey.toString()];
