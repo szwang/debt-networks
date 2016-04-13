@@ -19,7 +19,7 @@ $(document).ready(function() {
 
 function initNetwork(year, quarter) {
   $("#network").remove();
-  // $("#container").append("<img id='loadingGif' src='../data/loading.gif' />")
+  // $("#container").append("<img id='loadingGif' src='../assets/loading.gif' />")
   getNodes(year, quarter, function() {
     getLinks(year, quarter, function() {
       construct();
@@ -252,7 +252,7 @@ function getNodes(year, quarter, callback) {
   nodeData = [];
   nodeOrder = {};
 
-  $.getJSON('../data/nodes.json', function(allNodes) {
+  $.getJSON('../assets/nodes.json', function(allNodes) {
     _.forEach(allNodes, (val) => {
       var timeKey = constructTimeKey(year, quarter, "node");
       var debt = val[timeKey.toString()];
@@ -274,7 +274,7 @@ function getNodes(year, quarter, callback) {
 function getLinks(year, quarter, callback) {
   linkData = [];
 
-  $.getJSON('../data/links.json', function(allLinks) {
+  $.getJSON('../assets/links.json', function(allLinks) {
     _.forEach(allLinks, (val) => {
       var timeKey = constructTimeKey(year, quarter, "link");
       var debt = val[timeKey.toString()];
